@@ -1,0 +1,75 @@
+.wrapper {
+  width: 300px;
+  min-height: 100vh;
+  background: #cecece;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+}
+
+button {
+  background: none;
+  border: none;
+  outline: none;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+.filters-wrapper {
+  margin-top: 1em;
+}
+
+.accordion-filters-list .item {
+  overflow: hidden;
+}
+
+.accordion-filters-list .item .accordion-filter {
+  max-width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #e7e7e7;
+  padding: 1em;
+}
+
+.accordion-list {
+  background: #fff;
+  max-height: 0;
+  transition: 0.3s;
+}
+
+.accordion-list.active {
+  transition: 0.3s;
+
+}
+.accordion-filters-list .item .accordion-filter .title {
+  font-size: 1.4em;
+  font-weight: 800;
+}
+
+.filters-items-list-wrapper .item {
+  display: flex;
+  align-items: center;
+  padding: 1em;
+  font-size: 1.2em;
+}
+
+.filters-items-list-wrapper .item .name {
+  margin-left: 1em;
+}
+
+@keyframes accordion-show {
+  from {
+    height: 0;
+  }
+  to {
+    height: auto;
+  }
+}
