@@ -1,32 +1,48 @@
-const jobs = [
-  {
-    category: "BUISNES ANALYSIS",
-    title: "Business Analyst (Low-Code Platforms)",
-    typeOfEmployment: ["REMOTE"],
-    location: ["Poland", "Ukraine"],
-  },
-  {
-    category: "DEVELOPER",
-    title: "Senior C++ Developer",
-    typeOfEmployment: ["REMOTE"],
-    location: ["Poland", "Ukraine"],
-  },
-  {
-    category: "DATA SCIENCE",
-    title: "Senior MySQL Developer",
-    typeOfEmployment: ["REMOTE"],
-    location: ["Ukraine"],
-  },
-  {
-    category: "BUISNES ANALYSIS",
-    title: "BUISNES ANALYSIS",
-    typeOfEmployment: ["REMOTE"],
-    location: ["USA", "Ukraine"],
-  },
-];
+const bannerContent = document.getElementById("bannerContent");
+const workspace = document.getElementById("workspace");
+const selectedFilters = document.getElementById("selectedFilters");
+// header
+const header = document.getElementById("header");
+const filtersOpen = document.getElementById("filtersOpen");
+const menu = document.getElementById("menu");
 
-const workArea = document.getElementsByClassName('workarea-wrapper');
-const header = document.getElementById('header');
+function setBar() {
+  workspace.style.marginTop = -selectedFilters.clientHeight - 120 + "px";
+  bannerContent.style.paddingBottom = selectedFilters.clientHeight + 120 + "px";
+}
 
-workArea[0].style.height = `calc(${workArea[0].scrollHeight}px - 10vh)`;
+// function setHeader() {
+//   const menu = document.getElementById("menu");
+//   if (!menu) {
+//     if (window.scrollY > 10) {
+//       header.classList.add("active");
+//     } else if (window.scrollY <= 10) {
+//       header.classList.remove("active");
+//     }
+//   } else {
+//     header.classList.toogle("active");
+//   }
+// }
 
+function setFiltersMobile() {
+  filtersOpen.style.top = header.clientHeight + "px";
+  filtersOpen.style.height = `calc(100vh - ${header.clientHeight}px)`;
+}
+
+function setPaddingMenu() {
+  if (menu) {
+    menu.style.paddingTop = header.clientHeight + 100 + "px";
+    console.log(menu.style)
+  }
+}
+
+console.log(menu);
+
+setPaddingMenu();
+setBar();
+setFiltersMobile();
+window.addEventListener("resize", setBar);
+window.addEventListener("resize", setPaddingMenu);
+// selectedFilters.addEventListener("resize", setBar);
+window.addEventListener("setFiltersMobile", setBar);
+// window.addEventListener("scroll", setHeader);

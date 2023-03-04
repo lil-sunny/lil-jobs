@@ -21,60 +21,211 @@
     />
   </head>
   <body>
-    <main class="app">
+    <main id="app" class="app" :class="{hidden: isMenuOpen}">
       <!-- header -->
-      <header id="header" class="header col-12 active">
+      <header
+        id="header"
+        class="header col-12"
+        :class="{ dropMenuOpen : isShowDropMenu }"
+      >
         <div class="top-line menu-float d-flex justify-content-between">
           <div class="left-side">
             <a class="logo" href="#">softserve</a>
           </div>
           <div class="right-side">
-            <nav class="navigation d-flex align-items-center">
-              <a class="item" href="#">CAREERS</a>
+            <nav class="navigation d-flex">
+              <a class="item item-main" href="#">CAREERS</a>
               <button class="btn btn-search item">
                 <span class="material-symbols-outlined"> search </span>
               </button>
-              <button class="btn btn-menu item">
-                <span class="material-symbols-outlined"> menu </span>
+              <button @click="openMenu" class="btn btn-menu item">
+                <span v-if="!isMenuOpen" class="material-symbols-outlined">
+                  menu
+                </span>
+                <span v-if="isMenuOpen" class="material-symbols-outlined">
+                  close
+                </span>
               </button>
             </nav>
           </div>
         </div>
 
         <div class="bottom-line menu-float d-flex justify-content-end">
-          <nav class="navigation">
+          <nav class="navigation d-flex">
             <a class="item" href="#">LOG IN AS ASSOCIATE</a>
           </nav>
         </div>
-      </header>
-      <!-- banner -->
-      <div class="bannerWrapper">
-        <div class="banner">
-          <div class="videoWrapper">
-            <video
-              class="banner-video"
-              id="video"
-              muted
-              autoplay="autoplay"
-              loop="loop"
-              poster="https://career.softserveinc.com/uploads/vacancyCover/default.png"
-            >
-              <source
-                src="https://career.softserveinc.com/uploads/vacancyCover/video1.mp4"
-                type="video/mp4"
-              />
-            </video>
+
+        <!-- mobiles -->
+        <div class="mobile-search-wrapper">
+          <div class="search-wrapper d-flex">
+            <div class="search-pannel d-flex">
+              <span class="material-symbols-outlined"> search </span>
+              <input v-model="search" type="text" class="serch-input" />
+              <span class="found-count"
+                >{{ filteredJobs.length }} jobs openning</span
+              >
+            </div>
+            <div class="btn-wrapper">
+              <button class="filter-btn" @click="showOrHideMobileFilters">
+                <span class="material-symbols-outlined"> filter_alt </span>
+              </button>
+            </div>
           </div>
-          <div class="background-blue"></div>
-          <div class="banner-content container-fliud">
-            <div class="banner-centred-wrapper col-10 col-sm-9 col-md-7">
-              <div class="rect"></div>
-              <h1 class="title">BE ONE <br />OF US</h1>
-              <div class="description-wrapper">
-                <div class="line"></div>
-                <div class="description">
-                  FIND YOUR PERFECT POSITION AT SOFTSERVE AMONG ALL OPEN
-                  VACANCIES BELOW
+        </div>
+
+        <div id="filtersOpen" class="filters-open" v-show="isShowMobileFilters">
+          <div class="filters-accordion-wrapper container">
+            <div class="filters-wrapper">
+              <div class="accordion-filters-wrapper">
+                <ul class="accordion-filters-list">
+                  <li
+                    v-for="filter in this.unique(filters)"
+                    :key="filter.id"
+                    class="item"
+                  >
+                    <div class="accordion-filter">
+                      <span class="title">{{ filter.toUpperCase() }}</span>
+                      <button class="accordion-btn" class="btn">
+                        <span class="material-symbols-outlined"> add </span>
+                      </button>
+                    </div>
+                    <ul class="filters-items-list-wrapper accordion-list">
+                      <li
+                        class="item"
+                        v-for="item in filters"
+                        v-if="item.name == filter"
+                      >
+                        <button
+                          class="check-box"
+                          :class="{active : item.selected}"
+                          @click="setFilter(item)"
+                        >
+                          <span
+                            v-show="item.selected"
+                            class="material-symbols-outlined"
+                          >
+                            check
+                          </span>
+                        </button>
+                        <span class="name">{{ item.title }}</span>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+                <div class="filters-apply-wrapper">
+                  <button
+                    @click="showOrHideMobileFilters"
+                    class="apply-filter-btn"
+                  >
+                    APPLY
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- mobile menu -->
+      </header>
+      <div v-if="isMenuOpen" id="menu" class="main-menu">
+        <transition name="dropMenu">
+          <div v-if="isShowDropMenu" class="drop-menu-wrapper" :class="{active: isShowDropMenu}">
+            <div class="content">
+              <div id="drop-menu-header" class="header">
+                <button class="back-btn" @click="{isShowDropMenu = false}">
+                  <span class="material-symbols-outlined">
+                    keyboard_arrow_left
+                  </span>
+                  <span>Back to menu</span>
+                </button>
+              </div>
+              <div class="title">Drop menu</div>
+              <ul class="drop-menu-list">
+                <li class="item">
+                  <a href="">Home</a>
+                </li>
+                <li class="item">
+                  <a href="">Careers</a>
+                </li>
+                <li class="item">
+                  <a href="">Contacts</a>
+                </li>
+                <li class="item">
+                  <a href="">Blog</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </transition>
+        <div class="content">
+          <nav class="menu">
+            <ul class="main-menu-list">
+              <li class="item">
+                <div class="left-side">
+                  <span class="number">01</span>
+                  <a class="active" href="">Home</a>
+                </div>
+              </li>
+              <li class="item">
+                <span class="number">02</span>
+                <a href="">Careers</a>
+              </li>
+              <li class="item">
+                <span class="number">03</span>
+                <a href="">Contacts</a>
+              </li>
+              <li class="item">
+                <span class="number">04</span>
+                <a href="">Blog</a>
+              </li>
+              <li class="item item-drop">
+                <div class="left-side">
+                  <span class="number">05</span>
+                  <a @click="dropMenu">Drop item</a>
+                </div>
+                <span
+                  :class="{active: isShowDropMenu}"
+                  class="drop-arrow material-symbols-outlined"
+                >
+                  arrow_right
+                </span>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      <!-- banner -->
+      <div class="banner">
+        <video
+          class="banner-video"
+          id="video"
+          muted
+          autoplay="autoplay"
+          loop="loop"
+          poster="https://career.softserveinc.com/uploads/vacancyCover/default.png"
+        >
+          <source
+            src="https://career.softserveinc.com/uploads/vacancyCover/video1.mp4"
+            type="video/mp4"
+          />
+        </video>
+        <div id="bannerContent" class="top">
+          <div class="banner-content-wrapper container d-flex">
+            <div class="text row col-md-10 col-9 mx-auto">
+              <div class="colum col-md-5 col-12">
+                <div class="rect"></div>
+                <h1 class="title">
+                  BE ONE <br />
+                  OF US
+                </h1>
+              </div>
+              <div class="colum col-md-7 col-12">
+                <div class="description-wrapper">
+                  <div class="line"></div>
+                  <div class="description">
+                    FIND YOUR PERFECT POSITION AT SOFTSERVE AMONG ALL OPEN
+                    VACANCIES BELOW
+                  </div>
                 </div>
               </div>
             </div>
@@ -82,87 +233,45 @@
         </div>
       </div>
       <div class="workarea-wrapper">
-        <div class="workspace container col-12 col-md-9">
+        <div id="workspace" class="workspace container col-12 col-md-9">
           <div class="row">
-            <div class="col-12 col-md-4">
+            <div
+              id="desktop-filters"
+              class="filters-accordion-wrapper col-12 col-md-4"
+            >
               <div class="filters-wrapper">
                 <div class="accordion-filters-wrapper">
                   <ul class="accordion-filters-list">
-                    <li class="item">
+                    <li
+                      v-for="filter in this.unique(filters)"
+                      :key="filter.id"
+                      class="item"
+                    >
                       <div class="accordion-filter">
-                        <span class="title">LOCATIONS</span>
+                        <span class="title">{{ filter.toUpperCase() }}</span>
                         <button class="accordion-btn" class="btn">
                           <span class="material-symbols-outlined"> add </span>
                         </button>
                       </div>
                       <ul class="filters-items-list-wrapper accordion-list">
-                        <li class="item">
-                          <input type="checkbox" name="" id="" />
-                          <span class="name">Poland</span>
-                        </li>
-                        <li class="item">
-                          <input type="checkbox" name="" id="" />
-                          <span class="name">Ukraine</span>
-                        </li>
-                        <li class="item">
-                          <input type="checkbox" name="" id="" />
-                          <span class="name">USA</span>
-                        </li>
-                        <li class="item">
-                          <input type="checkbox" name="" id="" />
-                          <span class="name">Canada</span>
-                        </li>
-                        <li class="item">
-                          <input type="checkbox" name="" id="" />
-                          <span class="name">Sweeden</span>
-                        </li>
-                      </ul>
-                    </li>
-                    <li class="item">
-                      <div class="accordion-filter">
-                        <span class="title">LOCATIONS</span>
-                        <button class="accordion-btn" class="btn">
-                          <span class="material-symbols-outlined"> add </span>
-                        </button>
-                      </div>
-                      <ul class="filters-items-list-wrapper accordion-list">
-                        <li class="item">
-                          <input type="checkbox" name="" id="" />
-                          <span class="name">Poland</span>
-                        </li>
-                        <li class="item">
-                          <input type="checkbox" name="" id="" />
-                          <span class="name">Ukraine</span>
-                        </li>
-                        <li class="item">
-                          <input type="checkbox" name="" id="" />
-                          <span class="name">USA</span>
-                        </li>
-                        <li class="item">
-                          <input type="checkbox" name="" id="" />
-                          <span class="name">Canada</span>
-                        </li>
-                        <li class="item">
-                          <input type="checkbox" name="" id="" />
-                          <span class="name">Sweeden</span>
-                        </li>
-                      </ul>
-                    </li>
-                    <li class="item">
-                      <div class="accordion-filter">
-                        <span class="title">LOCATIONS</span>
-                        <button class="accordion-btn" class="btn">
-                          <span class="material-symbols-outlined"> add </span>
-                        </button>
-                      </div>
-                      <ul class="filters-items-list-wrapper accordion-list">
-                        <li class="item">
-                          <input type="checkbox" name="" id="" />
-                          <span class="name">Poland</span>
-                        </li>
-                        <li class="item">
-                          <input type="checkbox" name="" id="" />
-                          <span class="name">Ukraine</span>
+                        <li
+                          class="item"
+                          v-for="item in filters"
+                          v-if="item.name == filter"
+                        >
+                          <button
+                            class="check-box"
+                            :class="{active : item.selected}"
+                            @click="setFilter(item)"
+                          >
+                            <span
+                              v-show="item.selected"
+                              class="material-symbols-outlined"
+                            >
+                              check
+                            </span>
+                          </button>
+                          <span class="name">{{ item.title }}</span>
                         </li>
                       </ul>
                     </li>
@@ -174,23 +283,25 @@
               <div class="search-wrapper">
                 <div class="search-pannel d-flex">
                   <span class="material-symbols-outlined"> search </span>
-                  <input type="text" class="serch-input" />
-                  <span class="found-count">31 jobs openning</span>
+                  <input v-model="search" type="text" class="serch-input" />
+                  <span class="found-count"
+                    >{{ resultJobs.fullJobsList.length }} jobs openning</span
+                  >
                 </div>
               </div>
-              <div class="filters-wrapper">
+              <div id="selectedFilters" class="filters-wrapper">
                 <ul class="filters-list d-flex">
-                  <li class="item d-flex align-items-center">
-                    <span>Poland</span>
-                    <span class="icon material-symbols-outlined"> close </span>
-                  </li>
-                  <li class="item d-flex align-items-center">
-                    <span>German</span>
-                    <span class="icon material-symbols-outlined"> close </span>
-                  </li>
-                  <li class="item d-flex align-items-center">
-                    <span>Junior</span>
-                    <span class="icon material-symbols-outlined"> close </span>
+                  <li
+                    class="item d-flex align-items-center"
+                    v-for="filter in selectedFilters"
+                    :key="filter.id"
+                  >
+                    <span>{{ filter.title }}</span>
+                    <button class="close-btn" @click="removeFilter(filter)">
+                      <span class="icon material-symbols-outlined">
+                        close
+                      </span>
+                    </button>
                   </li>
                 </ul>
               </div>
@@ -200,249 +311,62 @@
               </div>
               <div class="result-jobs-wrapper">
                 <ul class="jobs-list">
-                  <li class="item">
+                  <li class="item" v-for="job in resultJobs.jobsOnPage">
                     <div class="job-wrapper">
                       <div class="job-header">
-                        <span class="category">BUISNES ANALYSIS</span>
+                        <span class="category"
+                          >{{ job.category.toUpperCase() }}</span
+                        >
                         <div class="type-of-employment">
-                          <span class="item">REMOTE</span>
-                          <span class="item">/</span>
-                          <span class="item">OFFICE</span>
+                          <div v-for="t in job.typeOfEmployment" class="d-flex">
+                            <span class="item">{{ t.toUpperCase() }} </span>
+                            <!-- <span class="item">/</span> -->
+                          </div>
                         </div>
                       </div>
                       <div class="title-wrapper">
-                        <span class="title"
-                          >Business Analyst (Low-Code Platforms)</span
-                        >
+                        <span class="title">{{ job.title }}</span>
                       </div>
-                      <div class="location-wrapper">
+                      <div class="location-wrapper d-flex">
                         <span class="icon material-symbols-outlined">
                           location_on
                         </span>
-                        <span class="location">POLAND; UKRAINE;</span>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="item">
-                    <div class="job-wrapper">
-                      <div class="job-header">
-                        <span class="category">BUISNES ANALYSIS</span>
-                        <div class="type-of-employment">
-                          <span class="item">REMOTE</span>
-                          <span class="item">/</span>
-                          <span class="item">OFFICE</span>
-                        </div>
-                      </div>
-                      <div class="title-wrapper">
-                        <span class="title"
-                          >Business Analyst (Low-Code Platforms)</span
-                        >
-                      </div>
-                      <div class="location-wrapper">
-                        <span class="icon material-symbols-outlined">
-                          location_on
+                        <span class="location" v-for="l in job.location"
+                          >{{ l.toUpperCase() }};
                         </span>
-                        <span class="location">POLAND; UKRAINE;</span>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="item">
-                    <div class="job-wrapper">
-                      <div class="job-header">
-                        <span class="category">BUISNES ANALYSIS</span>
-                        <div class="type-of-employment">
-                          <span class="item">REMOTE</span>
-                          <span class="item">/</span>
-                          <span class="item">OFFICE</span>
-                        </div>
-                      </div>
-                      <div class="title-wrapper">
-                        <span class="title"
-                          >Business Analyst (Low-Code Platforms)</span
-                        >
-                      </div>
-                      <div class="location-wrapper">
-                        <span class="icon material-symbols-outlined">
-                          location_on
-                        </span>
-                        <span class="location">POLAND; UKRAINE;</span>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="item">
-                    <div class="job-wrapper">
-                      <div class="job-header">
-                        <span class="category">BUISNES ANALYSIS</span>
-                        <div class="type-of-employment">
-                          <span class="item">REMOTE</span>
-                          <span class="item">/</span>
-                          <span class="item">OFFICE</span>
-                        </div>
-                      </div>
-                      <div class="title-wrapper">
-                        <span class="title"
-                          >Business Analyst (Low-Code Platforms)</span
-                        >
-                      </div>
-                      <div class="location-wrapper">
-                        <span class="icon material-symbols-outlined">
-                          location_on
-                        </span>
-                        <span class="location">POLAND; UKRAINE;</span>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="item">
-                    <div class="job-wrapper">
-                      <div class="job-header">
-                        <span class="category">BUISNES ANALYSIS</span>
-                        <div class="type-of-employment">
-                          <span class="item">REMOTE</span>
-                          <span class="item">/</span>
-                          <span class="item">OFFICE</span>
-                        </div>
-                      </div>
-                      <div class="title-wrapper">
-                        <span class="title"
-                          >Business Analyst (Low-Code Platforms)</span
-                        >
-                      </div>
-                      <div class="location-wrapper">
-                        <span class="icon material-symbols-outlined">
-                          location_on
-                        </span>
-                        <span class="location">POLAND; UKRAINE;</span>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="item">
-                    <div class="job-wrapper">
-                      <div class="job-header">
-                        <span class="category">BUISNES ANALYSIS</span>
-                        <div class="type-of-employment">
-                          <span class="item">REMOTE</span>
-                          <span class="item">/</span>
-                          <span class="item">OFFICE</span>
-                        </div>
-                      </div>
-                      <div class="title-wrapper">
-                        <span class="title"
-                          >Business Analyst (Low-Code Platforms)</span
-                        >
-                      </div>
-                      <div class="location-wrapper">
-                        <span class="icon material-symbols-outlined">
-                          location_on
-                        </span>
-                        <span class="location">POLAND; UKRAINE;</span>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="item">
-                    <div class="job-wrapper">
-                      <div class="job-header">
-                        <span class="category">BUISNES ANALYSIS</span>
-                        <div class="type-of-employment">
-                          <span class="item">REMOTE</span>
-                          <span class="item">/</span>
-                          <span class="item">OFFICE</span>
-                        </div>
-                      </div>
-                      <div class="title-wrapper">
-                        <span class="title"
-                          >Business Analyst (Low-Code Platforms)</span
-                        >
-                      </div>
-                      <div class="location-wrapper">
-                        <span class="icon material-symbols-outlined">
-                          location_on
-                        </span>
-                        <span class="location">POLAND; UKRAINE;</span>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="item">
-                    <div class="job-wrapper">
-                      <div class="job-header">
-                        <span class="category">BUISNES ANALYSIS</span>
-                        <div class="type-of-employment">
-                          <span class="item">REMOTE</span>
-                          <span class="item">/</span>
-                          <span class="item">OFFICE</span>
-                        </div>
-                      </div>
-                      <div class="title-wrapper">
-                        <span class="title"
-                          >Business Analyst (Low-Code Platforms)</span
-                        >
-                      </div>
-                      <div class="location-wrapper">
-                        <span class="icon material-symbols-outlined">
-                          location_on
-                        </span>
-                        <span class="location">POLAND; UKRAINE;</span>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="item">
-                    <div class="job-wrapper">
-                      <div class="job-header">
-                        <span class="category">BUISNES ANALYSIS</span>
-                        <div class="type-of-employment">
-                          <span class="item">REMOTE</span>
-                          <span class="item">/</span>
-                          <span class="item">OFFICE</span>
-                        </div>
-                      </div>
-                      <div class="title-wrapper">
-                        <span class="title"
-                          >Business Analyst (Low-Code Platforms)</span
-                        >
-                      </div>
-                      <div class="location-wrapper">
-                        <span class="icon material-symbols-outlined">
-                          location_on
-                        </span>
-                        <span class="location">POLAND; UKRAINE;</span>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="item">
-                    <div class="job-wrapper">
-                      <div class="job-header">
-                        <span class="category">BUISNES ANALYSIS</span>
-                        <div class="type-of-employment">
-                          <span class="item">REMOTE</span>
-                          <span class="item">/</span>
-                          <span class="item">OFFICE</span>
-                        </div>
-                      </div>
-                      <div class="title-wrapper">
-                        <span class="title"
-                          >Business Analyst (Low-Code Platforms)</span
-                        >
-                      </div>
-                      <div class="location-wrapper">
-                        <span class="icon material-symbols-outlined">
-                          location_on
-                        </span>
-                        <span class="location">POLAND; UKRAINE;</span>
                       </div>
                     </div>
                   </li>
                 </ul>
-                <div class="pages-numbers-wrapper">
-                  <ul class="pages-number-list">
-                    <li class="item active">1</li>
-                    <li class="item">2</li>
-                    <li class="item">3</li>
-                    <li class="item">4</li>
-                    <li class="item">
-                      <span class="icon material-symbols-outlined">
-                        arrow_right_alt
+                <div class="pagination-wrapper">
+                  <div class="btn-wrapper">
+                    <button
+                      class="toogle"
+                      :disabled="pageNumber === 0"
+                      @click="prevPage"
+                    >
+                      <span class="material-symbols-outlined">
+                        arrow_back
                       </span>
-                    </li>
-                  </ul>
+                    </button>
+                    <button
+                      class="page-num"
+                      v-for="p in pageCount"
+                      :class="{active: p === pageNumber + 1}"
+                      @click="openPage(p)"
+                    >
+                      {{ p }}
+                    </button>
+                    <button
+                      class="toogle"
+                      :disabled="pageNumber >= pageCount - 1"
+                      @click="nextPage"
+                    >
+                      <span class="material-symbols-outlined">
+                        arrow_forward
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -451,7 +375,7 @@
       </div>
       <footer class="footer">
         <div class="footer-container d-flex justify-content-between flex-wrap">
-          <div class="col-md-5 col-12">
+          <div class="col-md-5 col-sm-6 col-8 mx-auto">
             <div class="title-warpper">
               <span class="title">CONTACTS</span>
               <div class="line"></div>
@@ -477,7 +401,7 @@
               </div>
             </div>
           </div>
-          <div class="hot-links col-md-5 col-12">
+          <div class="hot-links col-md-5 col-sm-6 col-8 mx-auto">
             <div class="title-warpper">
               <span class="title">HOT LINKS</span>
               <div class="line"></div>
@@ -505,8 +429,11 @@
                     <li class="item"><a href="#">Careers</a></li>
                     <li class="item"><a href="#">University</a></li>
                     <li class="item"><a href="#">Job Openings</a></li>
-                    <li class="item"><a href="#">Learning & Certification</a></li>
+                    <li class="item">
+                      <a href="#">Learning & Certification</a>
+                    </li>
                     <li class="item"><a href="#">For Universities</a></li>
+                    <!-- <li class="item"><a href="#">{{ this.unique(filters) }}</a></li> -->
                   </ul>
                 </div>
               </div>
@@ -515,8 +442,390 @@
         </div>
       </footer>
     </main>
-    <script src="../scripts/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14"></script>
+    <script>
+      "use strict";
+      let app = new Vue({
+        el: "#app",
+        data: {
+          jobs: [
+            {
+              category: "BUISNES ANALYSIS",
+              title: "Business Analyst (Low-Code Platforms)",
+              typeOfEmployment: ["REMOTE"],
+              location: ["Poland", "Ukraine"],
+              tags: [
+                "Junior",
+                "Strong Junior",
+                "Poland",
+                "Ukraine",
+                "Business",
+                "Analys",
+              ],
+            },
+            {
+              category: "DEVELOPER",
+              title: "Senior C++ Developer",
+              typeOfEmployment: ["REMOTE"],
+              location: ["Poland", "Ukraine"],
+              tags: ["Senior", "Poland", "Ukraine", "C++", "C/C++", "Gamedev"],
+            },
+            {
+              category: "DATA SCIENCE",
+              title: "Senior MySQL Developer",
+              typeOfEmployment: ["REMOTE", "office"],
+              location: ["Ukraine"],
+              tags: [
+                "Senior",
+                "Ukraine",
+                "SQL",
+                "MySql",
+                "Data Scince",
+                "Databases",
+              ],
+            },
+            {
+              category: "BUISNES ANALYSIS",
+              title: "Junior BUISNES ANALYSIS",
+              typeOfEmployment: ["REMOTE"],
+              location: ["USA", "Ukraine"],
+              tags: [
+                "Junior",
+                "Strong Junior",
+                "USA",
+                "Ukraine",
+                "Business",
+                "Analys",
+              ],
+            },
+            {
+              category: "JAVASCRIPT",
+              title: "Junior JavaScript (React) developper",
+              typeOfEmployment: ["REMOTE"],
+              location: ["USA", "Ukraine", "Latvia"],
+              tags: [
+                "Junior",
+                "Strong Junior",
+                "Latvia",
+                "Ukraine",
+                "React",
+                "JavaScript",
+                "USA",
+              ],
+            },
+            {
+              category: "JAVASCRIPT",
+              title: "Junior/Middle JavaScript (Vue) developper",
+              typeOfEmployment: ["REMOTE", "OFFICE"],
+              location: ["United Kingdom", "Ukraine", "Latvia"],
+              tags: [
+                "Junior",
+                "Strong Junior",
+                "Middle",
+                "Latvia",
+                "Ukraine",
+                "Vue",
+                "JavaScript",
+                "United Kingdom",
+              ],
+            },
+            {
+              category: "DATA SCIENCE",
+              title: "Junior NoSQL Developer (mongoDB)",
+              typeOfEmployment: ["REMOTE", "office"],
+              location: ["Ukraine"],
+              tags: [
+                "Junior",
+                "Ukraine",
+                "mongodb",
+                "NoSQL",
+                "Data Scince",
+                "Databases",
+              ],
+            },
+            {
+              category: "DEVELOPPER",
+              title: "Middle C/C++ developper",
+              typeOfEmployment: ["REMOTE"],
+              location: ["USA"],
+              tags: ["Middel", "Strong Junior", "USA", "C++", "C"],
+            },
+            {
+              category: "Marketing",
+              title: "Junior BUISNES ANALYSIS",
+              typeOfEmployment: ["REMOTE"],
+              location: ["USA", "Ukraine"],
+              tags: [
+                "Junior",
+                "Strong Junior",
+                "USA",
+                "Ukraine",
+                "Business",
+                "Analys",
+              ],
+            },
+            {
+              category: "BUISNES ANALYSIS",
+              title: "Junior BUISNES ANALYSIS",
+              typeOfEmployment: ["REMOTE"],
+              location: ["USA", "Ukraine"],
+              tags: [
+                "Junior",
+                "Strong Junior",
+                "USA",
+                "Ukraine",
+                "Business",
+                "Analys",
+              ],
+            },
+            {
+              category: "BUISNES ANALYSIS",
+              title: "Junior BUISNES ANALYSIS",
+              typeOfEmployment: ["REMOTE"],
+              location: ["USA", "Ukraine"],
+              tags: [
+                "Junior",
+                "Strong Junior",
+                "USA",
+                "Ukraine",
+                "Business",
+                "Analys",
+              ],
+            },
+            {
+              category: "BUISNES ANALYSIS",
+              title: "Junior BUISNES ANALYSIS",
+              typeOfEmployment: ["REMOTE"],
+              location: ["USA", "Ukraine"],
+              tags: [
+                "Junior",
+                "Strong Junior",
+                "USA",
+                "Ukraine",
+                "Business",
+                "Analys",
+              ],
+            },
+          ],
+          filters: [
+            {
+              id: 1,
+              name: "location",
+              category: "location",
+              title: "Ukraine",
+              selected: false,
+            },
+            {
+              id: 2,
+              name: "location",
+              category: "location",
+              title: "Poland",
+              selected: false,
+            },
+            {
+              id: 3,
+              name: "location",
+              category: "location",
+              title: "Latvia",
+              selected: false,
+            },
+            {
+              id: 4,
+              name: "location",
+              category: "location",
+              title: "Nitherland",
+              selected: false,
+            },
+            {
+              id: 5,
+              name: "directions",
+              category: "directions",
+              title: "Web-development",
+              selected: false,
+            },
+            {
+              id: 6,
+              name: "directions",
+              category: "directions",
+              title: "Big Data",
+              selected: false,
+            },
+            {
+              id: 7,
+              name: "directions",
+              category: "directions",
+              title: "Marketing",
+              selected: false,
+            },
+            {
+              id: 8,
+              name: "directions",
+              category: "direction",
+              title: "UI/UX",
+              selected: false,
+            },
+            {
+              id: 9,
+              name: "tech levels",
+              category: "techLevels",
+              title: "Junior",
+              selected: false,
+            },
+            {
+              id: 10,
+              name: "tech levels",
+              category: "techLevels",
+              title: "Trainee",
+              selected: false,
+            },
+            {
+              id: 11,
+              name: "tech levels",
+              category: "techLevels",
+              title: "Middle",
+              selected: false,
+            },
+            {
+              id: 12,
+              name: "tech levels",
+              category: "techLevels",
+              title: "Senior",
+              selected: false,
+            },
+          ],
+          selectedFilters: [],
+          search: "",
+          pageNumber: 0,
+          sizeOfPage: 10,
+          isShowMobileFilters: false,
+          isShowDropMenu: false,
+          isMenuOpen: false,
+        },
+        computed: {
+          filteredJobs() {
+            // SERACH CODE
 
+            return this.jobs.filter((job) => {
+              return job.title
+                .toLowerCase()
+                .includes(this.search.toLowerCase());
+            });
+          },
+          pageCount() {
+            let l = this.jobs.length;
+            let s = this.sizeOfPage;
+
+            return Math.ceil(l / s);
+          },
+          resultJobs() {
+            const filteredJobs = this.serchByFilters(this.jobs);
+            const jobs = filteredJobs.filter((job) => {
+              return job.title
+                .toLowerCase()
+                .includes(this.search.toLowerCase());
+            });
+            const start = this.pageNumber * this.sizeOfPage,
+              end = start + this.sizeOfPage;
+            return { jobsOnPage: jobs.slice(start, end), fullJobsList: jobs };
+          },
+        },
+        methods: {
+          unique(arr) {
+            let newFilters = [];
+            for (let f of arr) {
+              if (!newFilters.includes(f.name)) {
+                newFilters.push(f.name);
+              }
+            }
+            return newFilters;
+          },
+          setFilter(filter) {
+            if (filter.selected === false) {
+              filter.selected = true;
+              this.addFilter(filter);
+            } else if (filter.selected === true) {
+              filter.selected = false;
+              this.removeFilter(filter);
+            }
+          },
+          addFilter(filter) {
+            this.selectedFilters.push(filter);
+            this.serchByFilters();
+          },
+          removeFilter(filter) {
+            let indexOfFilter = this.selectedFilters.indexOf(filter);
+            this.selectedFilters.splice(indexOfFilter, 1);
+            filter.selected = false;
+          },
+          prevPage() {
+            this.pageNumber--;
+          },
+          nextPage() {
+            this.pageNumber++;
+          },
+          serchByFilters(jobs) {
+            let filteredJobs = [];
+            if (this.selectedFilters.length > 0) {
+              for (let job of this.jobs) {
+                for (let filter of this.selectedFilters) {
+                  job.tags.forEach((tag) => {
+                    if (tag.toLowerCase() === filter.title.toLowerCase()) {
+                      filteredJobs.push(job);
+                    }
+                  });
+                }
+              }
+              return filteredJobs;
+            } else {
+              return jobs;
+            }
+          },
+          showOrHideMobileFilters() {
+            if (this.isShowMobileFilters == true) {
+              this.isShowMobileFilters = false;
+            } else if (this.isShowMobileFilters == false) {
+              this.isShowMobileFilters = true;
+            }
+          },
+          dropMenu() {
+            if (this.isShowDropMenu == true) {
+              this.isShowDropMenu = false;
+            } else if (this.isShowDropMenu == false) {
+              this.isShowDropMenu = true;
+            }
+          },
+          openMenu() {
+            if (this.isMenuOpen == true) {
+              this.isMenuOpen = false;
+              this.isShowDropMenu = false;
+              this.setHeader();
+            } else if (this.isMenuOpen == false) {
+              this.isMenuOpen = true;
+              this.setHeader();
+            }
+          },
+          setHeader() {
+            const menu = document.getElementById("menu");
+            if (this.isMenuOpen == false) {
+              if (window.scrollY > 10) {
+                header.classList.add("active");
+              } else if (window.scrollY <= 10) {
+                header.classList.remove("active");
+              }
+            } else if (this.isMenuOpen == true) {
+              header.classList.remove("active");
+            }
+          },
+          openPage(number) {
+            this.pageNumber = number - 1;
+          },
+        },
+        mounted() {
+          window.addEventListener("scroll", this.setHeader);
+        },
+      });
+    </script>
+    <script src="../scripts/app.js"></script>
     <script src="../scripts/accordion.js"></script>
   </body>
 </html>
